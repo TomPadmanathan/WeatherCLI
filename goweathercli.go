@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 type Weather struct {
@@ -37,6 +38,7 @@ func main() {
 	var args []string = os.Args
 	var location string
 	var flags []rune
+	var forecast int
 	for index, arg := range args {
 		if index == 0 {
 			continue
@@ -60,10 +62,8 @@ func main() {
 		}
 
 		if arg == "--help" || arg == "-h" {
-			for _, flag := range flags {
-				if flag == 'h' {
-					panic("flag used multiple times")
-				}
+			if isFlagPresent('h', flags) {
+				panic("flag used multiple times")
 			}
 
 			flags = append(flags, 'h')
@@ -71,17 +71,50 @@ func main() {
 		}
 
 		if arg == "--temp" || arg == "-t" || arg == "--temperature" {
-			for _, flag := range flags {
-				if flag == 't' {
-					panic("flag used multiple times")
-				}
+			if isFlagPresent('t', flags) {
+				panic("flag used multiple times")
 			}
 
 			flags = append(flags, 't')
 			continue
 		}
 
+		// Check if flag is forcast
+		if len(arg) >= 11 {
+			if arg[:11] == "--forecast=" {
+				if isFlagPresent('f', flags) {
+					panic("flag used multiple times")
+				}
+				flags = append(flags, 'f')
+				number, err := strconv.Atoi(arg[11:])
+				forecast = number
+				if err != nil {
+					panic("Invalid Forcast Flag")
+				}
+				continue
+			}
+		}
+		if len(arg) >= 3 {
+			if arg[:3] == "-f=" {
+				if isFlagPresent('f', flags) {
+					panic("flag used multiple times")
+				}
+				flags = append(flags, 'f')
+				number, err := strconv.Atoi(arg[3:])
+				forecast = number
+				if err != nil {
+					panic("Invalid Forcast Flag")
+				}
+				continue
+			}
+		}
+
 		panic("Invalid flag")
+	}
+
+	if isFlagPresent('h', flags) {
+		fmt.Println("help")
+		return
 	}
 
 	// If no location provided set to England
@@ -89,7 +122,7 @@ func main() {
 		location = "England"
 	}
 
-	var url string = fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s&days=1&aqi=no&alerts=no", os.Getenv("WeatherApiKey"), location)
+	var url string = fmt.Sprintf("https://api.weatherapi.com/v1/forecast.json?key=%s&q=%s&days=1&aqi=no&alerts=no", os.Getenv("WeatherApiKey"), location)
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -113,8 +146,15 @@ func main() {
 	}
 
 	if isFlagPresent('t', flags) {
-		fmt.Printf("Current temperature in %s is: %s°c \n", weather.Location.Name, fmt.Sprintf("%.1f", weather.Current.TempC))
+		fmt.Printf("Current temperature in %s, %s is: %s°c \n", weather.Location.Name, weather.Location.Country, fmt.Sprintf("%.1f", weather.Current.TempC))
+		return
 	}
+
+	fmt.Printf("Weather in %s, %s:\n\nCurrent Temperature: %s°c\nCurrent Weather Condition: %s\n", weather.Location.Name, weather.Location.Country, fmt.Sprintf("%.1f", weather.Current.TempC), weather.Current.Condition.Text)
+
+	fmt.Println(weather.Forecast.Forecastday[0].Hour[10])
+
+	fmt.Println(forecast)
 }
 
 func isFlagPresent(flag rune, flags []rune) bool {
