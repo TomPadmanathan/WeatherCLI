@@ -120,7 +120,15 @@ func main() {
 	}
 
 	if isFlagPresent('h', flags) {
-		fmt.Println("help")
+		fmt.Print("Get Weather CLI\n\n")
+		fmt.Print("To use this CLI use \"getweather [flags] [location]\"\n\n")
+
+		fmt.Println("Flags:")
+		fmt.Print("	--help\n	-h\n	Used to open this help screen.\n\n")
+		fmt.Print("	--temp\n	-t\n	Used to get just the temperature for a location.\n\n")
+		fmt.Print("	--forecast\n	-f\n	Used to get the forecast for up to the next 3 days. E.g: --forecast=2\n\n")
+		fmt.Println("View the source code for this CLI:")
+		fmt.Println("https://github.com/TomPadmanathan/WeatherCLI")
 		return
 	}
 
