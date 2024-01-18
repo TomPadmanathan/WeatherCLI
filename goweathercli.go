@@ -113,7 +113,7 @@ func main() {
 	}
 
 	if isFlagPresent('t', flags) {
-		fmt.Printf("Current temperature in %s is: %f°c \n", weather.Location.Name, weather.Current.TempC)
+		fmt.Printf("Current temperature in %s is: %s°c \n", weather.Location.Name, fmt.Sprintf("%.1f", weather.Current.TempC))
 	}
 }
 
