@@ -122,7 +122,17 @@ func main() {
 		location = "England"
 	}
 
-	var url string = fmt.Sprintf("https://api.weatherapi.com/v1/forecast.json?key=%s&q=%s&days=1&aqi=no&alerts=no", os.Getenv("WeatherApiKey"), location)
+	if forecast > 3 {
+		panic("Forcast is larger 3")
+	}
+
+	var forecastString string = "current"
+
+	if forecast > 0 {
+		forecastString = "forecast"
+	}
+
+	var url string = fmt.Sprintf("https://api.weatherapi.com/v1/%s.json?key=%s&q=%s&days=%v&aqi=no&alerts=no", forecastString, os.Getenv("WeatherApiKey"), location, forecast)
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -152,9 +162,17 @@ func main() {
 
 	fmt.Printf("Weather in %s, %s:\n\nCurrent Temperature: %s°c\nCurrent Weather Condition: %s\n", weather.Location.Name, weather.Location.Country, fmt.Sprintf("%.1f", weather.Current.TempC), weather.Current.Condition.Text)
 
-	fmt.Println(weather.Forecast.Forecastday[0].Hour[10])
-
-	fmt.Println(forecast)
+	if forecast > 0 {
+		fmt.Print("\nForcast:\n\n")
+	}
+	for index, day := range weather.Forecast.Forecastday {
+		fmt.Printf("Day %v:\n", index+1)
+		for index, hour := range day.Hour {
+			fmt.Printf("Hour %v:\n", index+1)
+			fmt.Printf("Temperature: %s°c\nWeather Condition: %s\nChance of rain: %s\n", fmt.Sprintf("%.1f", hour.TempC), hour.Condition.Text, fmt.Sprintf("%.1f", hour.ChanceOfRain))
+			fmt.Println()
+		}
+	}
 }
 
 func isFlagPresent(flag rune, flags []rune) bool {
