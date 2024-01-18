@@ -141,7 +141,16 @@ func main() {
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
-		panic("Weather API not available")
+		if res.StatusCode == 400 {
+			fmt.Println("Location provided is invalid")
+			return
+		}
+		if res.StatusCode == 403 {
+			fmt.Println("Api key is invalid")
+			return
+		}
+		fmt.Println("Something went wrong fetching data")
+		return
 	}
 
 	body, err := io.ReadAll(res.Body)
@@ -156,7 +165,16 @@ func main() {
 	}
 
 	if isFlagPresent('t', flags) {
-		fmt.Printf("Current temperature in %s, %s is: %s°c \n", weather.Location.Name, weather.Location.Country, fmt.Sprintf("%.1f", weather.Current.TempC))
+		fmt.Printf("Current temperature in %s, %s is: %s°c \n\n", weather.Location.Name, weather.Location.Country, fmt.Sprintf("%.1f", weather.Current.TempC))
+
+		if isFlagPresent('f', flags) {
+			for index, day := range weather.Forecast.Forecastday {
+				fmt.Printf("\nDay %v:\n", index+1)
+				for index, hour := range day.Hour {
+					fmt.Printf("Hour %v temperature: %s°c\n", index+1, fmt.Sprintf("%.1f", hour.TempC))
+				}
+			}
+		}
 		return
 	}
 
