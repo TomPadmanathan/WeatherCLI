@@ -63,7 +63,8 @@ func main() {
 
 		if arg == "--help" || arg == "-h" {
 			if isFlagPresent('h', flags) {
-				panic("flag used multiple times")
+				fmt.Println("Flag used multiple times")
+				return
 			}
 
 			flags = append(flags, 'h')
@@ -72,7 +73,8 @@ func main() {
 
 		if arg == "--temp" || arg == "-t" || arg == "--temperature" {
 			if isFlagPresent('t', flags) {
-				panic("flag used multiple times")
+				fmt.Println("Flag used multiple times")
+				return
 			}
 
 			flags = append(flags, 't')
@@ -83,13 +85,15 @@ func main() {
 		if len(arg) >= 11 {
 			if arg[:11] == "--forecast=" {
 				if isFlagPresent('f', flags) {
-					panic("flag used multiple times")
+					fmt.Println("Flag used multiple times")
+					return
 				}
 				flags = append(flags, 'f')
 				number, err := strconv.Atoi(arg[11:])
 				forecast = number
 				if err != nil {
-					panic("Invalid Forcast Flag")
+					fmt.Println("Invalid forcast flag")
+					return
 				}
 				continue
 			}
@@ -97,19 +101,22 @@ func main() {
 		if len(arg) >= 3 {
 			if arg[:3] == "-f=" {
 				if isFlagPresent('f', flags) {
-					panic("flag used multiple times")
+					fmt.Println("Flag used multiple times")
+					return
 				}
 				flags = append(flags, 'f')
 				number, err := strconv.Atoi(arg[3:])
 				forecast = number
 				if err != nil {
-					panic("Invalid Forcast Flag")
+					fmt.Println("Flag used multiple times")
+					return
 				}
 				continue
 			}
 		}
 
-		panic("Invalid flag")
+		fmt.Println("Invalid flag")
+		return
 	}
 
 	if isFlagPresent('h', flags) {
@@ -123,7 +130,8 @@ func main() {
 	}
 
 	if forecast > 3 {
-		panic("Forcast is larger 3")
+		fmt.Println("Forecast is larger than limit (3)")
+		return
 	}
 
 	var forecastString string = "current"
@@ -136,7 +144,8 @@ func main() {
 
 	res, err := http.Get(url)
 	if err != nil {
-		panic("Weather API not available")
+		fmt.Println("Something went wrong fetching data")
+		return
 	}
 	defer res.Body.Close()
 
@@ -155,13 +164,15 @@ func main() {
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		panic(err)
+		fmt.Println("Something went wrong fetching data")
+		return
 	}
 
 	var weather Weather
 	err = json.Unmarshal(body, &weather)
 	if err != nil {
-		panic(err)
+		fmt.Println("Something went wrong fetching data")
+		return
 	}
 
 	if isFlagPresent('t', flags) {
