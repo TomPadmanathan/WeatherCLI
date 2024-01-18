@@ -1,3 +1,3 @@
-module goweathercli
+module getweathercli
 
 go 1.21.6
