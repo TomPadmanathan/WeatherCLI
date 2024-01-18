@@ -126,7 +126,7 @@ func main() {
 
 	// If no location provided set to England
 	if len(location) == 0 {
-		location = "England"
+		location = "London"
 	}
 
 	if forecast > 3 {
