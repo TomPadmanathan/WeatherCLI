@@ -1,4 +1,4 @@
-# Get Weather CLI
+# Weather CLI
 ### Overview
 
 Get Weather CLI is a simple command-line interface (CLI) written in Golang that allows you to retrieve weather information for a specified location. Whether you need the current temperature or a forecast for the upcoming days, this CLI has you covered.
